@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+    tools { jdk 'JDK17' } // change if your Jenkins tool name is different
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                bat 'dir /b' // shows files in workspace for debugging
+            }
+        }
+        stage('Build') {
+            steps {
+                bat '.\\mvnw.cmd -B -v'
+                bat '.\\mvnw.cmd -B clean package -DskipTests'
+            }
+        }
+    }
+
+    post {
+        success {
+            archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+        }
+    }
+}
